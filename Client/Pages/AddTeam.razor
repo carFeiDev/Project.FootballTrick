@@ -1,0 +1,48 @@
+﻿@page "/add-team"
+@using Project.FootballTrick.Shared.Entities;
+@using Newtonsoft.Json;
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Agregar equipos</PageTitle>
+
+<h1>Agregar equipo</h1>
+
+<EditForm Model="@team" OnValidSubmit="SaveTeam"><DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="Name" class="form-label">Name</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="team.Name" />
+        </div>
+            <ValidationMessage For="@(() => team.Name)" />
+    </div>
+ 
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button class="btn btn-light" @onclick="Cancel">Cancel</button>
+    </div>
+</EditForm>
+
+@code {
+    protected Team team = new();
+    private string apiUrl = "api/team";
+
+    protected async Task SaveTeam()
+    {
+        string baseUrl = Navigation.BaseUri;
+        string url = $"{baseUrl}{this.apiUrl}/{"post-team"}";
+
+        if (team.Name == null)
+        {
+            return;
+        }
+
+        await Http.PostAsJsonAsync(url, team);
+        Navigation.NavigateTo("/teams-list");
+    }
+
+    protected async Task Cancel()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

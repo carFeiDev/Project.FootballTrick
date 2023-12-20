@@ -1,0 +1,92 @@
+@page "/teams-list"
+@using Project.FootballTrick.Shared.Entities;
+@using Microsoft.AspNetCore.Authorization; 
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;  
+@using Newtonsoft.Json;
+@attribute [Authorize];  
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@* para lograr hacer peticiones sin  validacion de usuario *@
+@inject IHttpClientFactory ClientFactory; 
+
+
+<PageTitle>Lista de Equipos</PageTitle>
+
+<h1>Lista de equipos</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Team id</th>
+                <th>Name</th>
+                <th>Fecha</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var std in teamsLists)
+            {
+                <tr>
+                    <td>@std.TeamId</td>
+                    <td>@std.Name</td>
+                    <td>@std.CreationDate</td>
+                    <td><button type="button" @onclick="(async () => await NavigateToUpdateTeam(std.TeamId))" class="btn btn-primary">Edit</button></td>                   
+                    <td><button type="button" @onclick="(async () => await DeleteTeam(std.TeamId))" class="btn btn-danger">Delete</button></td>                
+                </tr>
+
+            }
+        </tbody>
+    </table>
+
+<button type="button" @onclick="(async () => await NavigateToAddTeam())" class="btn btn-success"> Agregar un nuevo equipo</button>
+
+@code {
+
+    protected List<Team> teamsLists = new();
+    private string apiUrl = "api/team";   
+    protected override async Task OnInitializedAsync()
+    {
+        await GetTeamList();
+    }
+
+    protected async Task GetTeamList()
+    {   //-----
+        @* var client = ClientFactory.CreateClient("public"); *@
+        //------
+        string baseUrl = Navigation.BaseUri;
+        string url = $"{baseUrl}{this.apiUrl}";
+
+        var response = await Http.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+        string responseBodyJson = await response.Content.ReadAsStringAsync();
+
+        teamsLists = JsonConvert.DeserializeObject<List<Team>>(responseBodyJson);
+    }
+
+    protected async Task DeleteTeam(int teamId)
+    {
+        string baseUrl = Navigation.BaseUri;
+        string url = $"{baseUrl}{this.apiUrl}/{teamId}";
+
+        await Http.DeleteAsync(url);
+
+        Navigation.NavigateTo("/");
+    }
+
+    protected async Task NavigateToUpdateTeam(int teamId)
+    {
+        string pageURl = "update-team/" + teamId;
+  
+
+        Navigation.NavigateTo(pageURl);
+    }
+
+    protected async Task NavigateToAddTeam()
+    {
+        string pageURL = "add-team";
+
+        Navigation.NavigateTo(pageURL);
+    }
+
+
+}
