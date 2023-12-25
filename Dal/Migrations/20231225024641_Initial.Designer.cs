@@ -12,7 +12,7 @@ using Project.FootballTrick.Dal;
 namespace Project.FootballTrick.Dal.Migrations
 {
     [DbContext(typeof(FootballTrickContext))]
-    [Migration("20231118195452_Initial")]
+    [Migration("20231225024641_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Project.FootballTrick.Dal.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.9")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
